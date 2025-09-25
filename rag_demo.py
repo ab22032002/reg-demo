@@ -1,11 +1,10 @@
 # 1.Handling Imports
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.llms import HuggingFacePipeline
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFacePipeline
+from langchain_community.document_loaders import TextLoader, PyPDFLoader, Docx2txtLoader
 from transformers import pipeline
-
-from langchain.document_loaders import TextLoader, PyPDFLoader, Docx2txtLoader
 
 # 2.Module2
 # Filepath (replacing with user input or upload mechanism)
@@ -16,7 +15,7 @@ file_path = input("Enter the file path: ")
 try:
     with open(file_path, 'r') as f:
         content = f.read()
-        print("File content (first 100 chars):", content[:100])
+        # print("File content (first 100 chars):", content[:100])
 except FileNotFoundError:
     print(f"Error: The file '{file_path}' was not found.")
 except Exception as e:
@@ -50,18 +49,31 @@ llm = HuggingFacePipeline(pipeline=qa_pipeline)
 # 6. Retrieval + Q&A
 
 while True:
-    query = input("Ask your question (or type 'exit' to quit): ")
+    query = input("\nAsk your question (or type 'exit' to quit): ")
     
     if query.lower() in ["exit", "quit", "q"]:
-        print("Goodbye!")
+        print("\nGoodbye!")
         break
     
+    # Perform similarity search
     docs = db.similarity_search(query, k=3)
 
-    context = " ".join([d.page_content for d in docs])
+    # Combine context
+    context = "\n\n".join([f"Document {i+1}:\n{d.page_content}" for i, d in enumerate(docs)])
+    
+    # Prepare prompt
     prompt = f"Answer the question based only on the context below:\n\n{context}\n\nQuestion: {query}\nAnswer:"
-
+    
+    # Get AI response
     response = llm(prompt)
-    print("AI Answer:", response)
+    
+    # Nicely formatted output
+    print("\n" + "="*50)
+    print("Question:", query)
+    print("\nContext from documents:\n")
+    print(context)
+    print("\nAI Answer:\n")
+    print(response)
+    print("="*50 + "\n")
 
-print("ThankYou")
+print("Thank you for using the QA system!")
