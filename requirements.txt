@@ -1,0 +1,7 @@
+langchain
+chromadb
+faiss-cpu
+transformers
+torch
+sentence-transformers
+langchain-community

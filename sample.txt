@@ -1,0 +1,1 @@
+Accenture focuses on SLMs, Agentic AI, and RAG pipelines for enterprise use cases.
